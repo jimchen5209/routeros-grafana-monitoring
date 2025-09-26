@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 30s
+
+scrape_configs:
+  # Blackbox ICMP (Ping) From VPS
+  - job_name: 'ping-router'
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets:
+          - <router_ip_address>  # Replace with your router's IP address
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Pushgateway for RouterOS metrics
+  - job_name: 'routeros-pushed'
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']

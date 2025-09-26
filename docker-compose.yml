@@ -1,0 +1,71 @@
+services:
+  # Prometheus server
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    depends_on:
+      - blackbox-exporter
+      - pushgateway
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/web.yml:/etc/prometheus/web.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.config.file=/etc/prometheus/web.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  # Prometheus Blackbox Exporter for probing endpoints
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    ports:
+      - "9115:9115"
+    restart: unless-stopped
+
+  # Pushgateway for pushing metrics from routeros
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway
+    ports:
+      - "9091:9091"
+    restart: unless-stopped
+
+  # Choose either local Grafana or Grafana Cloud setup
+  # For local Grafana setup, use the following section
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+  # For Grafana Cloud setup, use the following section
+  # Make sure to replace <your_api_key>, <your_cluster_name>, and <your_gcloud_hosted_grafana_id> with actual values
+  # For setup go to https://<Your Grafana Cloud Stack Identifier>.grafana.net/connections/private-data-source-connections
+  grafana-pdc-agent:
+    image: grafana/pdc-agent:latest
+    container_name: pdc-agent
+    depends_on:
+      - prometheus
+    command:
+      - "-token"
+      - "<your_api_key>"
+      - "-cluster"
+      - "<your_cluster_name>"
+      - "-gcloud-hosted-grafana-id"
+      - "<your_gcloud_hosted_grafana_id>"
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  # Only for local grafana storage, not needed for Grafana Cloud
+  grafana-data:

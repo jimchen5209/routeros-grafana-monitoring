@@ -1,0 +1,4 @@
+# Hash your password with python script at prometheus-password-hashing folder
+# Example: <username>: <hashed_password>
+basic_auth_users:
+    admin: <hashed_password>
