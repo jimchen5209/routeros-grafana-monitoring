@@ -23,8 +23,6 @@ services:
   blackbox-exporter:
     image: prom/blackbox-exporter:latest
     container_name: blackbox-exporter
-    ports:
-      - "9115:9115"
     restart: unless-stopped
 
   # Pushgateway for pushing metrics from routeros
