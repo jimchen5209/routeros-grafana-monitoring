@@ -15,7 +15,7 @@ flowchart
 2. Setup a tunnel between your VPS and RouterOS with ZeroTier or other VPN solution.
 3. Update the `docker-compose.yml`, `prometheus/prometheus.yml` and `prometheus/web.yml` files with your specific configurations:
     - In `docker-compose.yml`, ensure the config in grafana section, if you want to host Grafana locally, use `grafana` service, if you want to use Grafana Cloud, use the [Private data source connect](https://grafana.com/docs/grafana-cloud/connect-externally-hosted/private-data-source-connect/) with `grafana-pdc-agent`.
-    - In `prometheus.yml`, add your RouterOS IP address in the `blackbox-exporter` job under `static_configs`. You can add mor endpoint there if you want. Note that the blackbox-exporter is used to ping from your VPS, not your RouterOS Network.
+    - In `prometheus/prometheus.yml`, add your RouterOS IP address in the `blackbox-exporter` job under `static_configs`. You can add mor endpoint there if you want. Note that the blackbox-exporter is used to ping from your VPS, not your RouterOS Network.
     - In `prometheus/web.yml`, set up basic authentication by hashing your password with the script in the `prometheus-password-hashing` folder.
 4. Start the monitoring stack with Docker
     ```bash
