@@ -4,10 +4,10 @@ Configuration to monitor RouterOS devices using [Prometheus](https://github.com/
 
 ## Flow
 ```mermaid
-flowchart LR
-    A[RouterOS] -- push --> B[Pushgateway (VPS)]
-    B -- scrape --> C[Prometheus (VPS)]
-    C -- data source --> D[Grafana (VPS or Grafana Cloud)]
+flowchart
+    A[RouterOS] -- push --> B[Pushgateway on VPS]
+    B -- scrape --> C[Prometheus on VPS]
+    C -- data source --> D[Local Grafana or Grafana Cloud]
 ```
 
 ## VPS Setup
