@@ -1632,7 +1632,7 @@
           "refId": "RX"
         }
       ],
-      "title": "Total Bytes",
+      "title": "Total Packets",
       "type": "stat"
     }
   ],
@@ -1681,7 +1681,7 @@
   "timezone": "browser",
   "title": "Router Stats",
   "uid": "9c9b3deb-c647-4c01-9265-b3996e31bbbc",
-  "version": 59,
+  "version": 60,
   "weekStart": "",
   "id": null
 }
