@@ -29,7 +29,7 @@ flowchart
 8. Add dashboards in Grafana. You can create your own or import existing ones from the Grafana dashboard repository. 
     * Example Query to get RouterOS ping metrics:
         ```
-        routeros_ping_latency{job="routeros", target="1.1.1.1"}
+        routeros_ping_latency{instance="home-router", target="1.1.1.1", tag="DNS"}
         ```
     * For other metrics, you can import the dashboard with `grafana/router-stats.json` file in this repo to get started.
 
