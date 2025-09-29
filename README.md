@@ -2,6 +2,8 @@
 
 Configuration to monitor RouterOS devices using [Prometheus](https://github.com/prometheus/prometheus) and [Grafana](https://grafana.com), with a VPS as an intermediary. Metrics are pushed from RouterOS to a [Pushgateway](https://github.com/prometheus/pushgateway) on the VPS, and Prometheus scrapes the Pushgateway.
 
+![Preview](./images/preview.png)
+
 ## Flow
 ```mermaid
 flowchart
