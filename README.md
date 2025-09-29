@@ -29,56 +29,38 @@ flowchart
         ```
         routeros_ping_latency{job="routeros", target="1.1.1.1"}
         ```
-    * Example Query to get blackbox-exporter ping metrics:
-        ```
-        probe_duration_seconds{instance="<your router ip>"} * 1000
-        ```
+    * For other metrics, you can import the dashboard with `grafana/router-stats.json` file in this repo to get started.
 
 ## RouterOS Script Setup (For RouterOS v7)
 
 Add the following script in your RouterOS to push metrics to your VPS Pushgateway endpoint.
 Best setup:
-1. Create a script with the content below, name it `push-metrics`. With permission policy `read` and `test`.  
+1. Create a script with the content in `routeros/push-metric.rsc`, name it `push-metrics`. With permission policy `read` and `test`.  
+2. Modify the script to fit your needs.
+    * Make sure to update vps variable with your VPS IP address or domain name. You can also change the routerName variable to identify your router in Grafana.  
+        ```
+        # Basic info
+        :local routerName "home-router"
+        :local vps "http://<your vps ip>:9091"
+        ```
+    * Add or remove metrics as needed. The example script includes CPU load, memory usage, and other relevant metrics.
+    * For ping metrics, you can change the target IP address and TAG for your preference in the following section.
+        ```
+        # For Tag DNS
+        :local pingDNSTargets {"8.8.8.8";"1.1.1.1"}
+        :foreach t in=$pingDNSTargets do={
+            :local latency [$pingLatency $t]
+            :set pingMetrics ($pingMetrics . "routeros_ping_latency{target=\"$t\",tag=\"DNS\"} $latency\n")
+        }
 
-    ```
-    # Format Latency Number
-    :local pingLatency do={
-      :local target $1
-      :local result [/ping $target count=1 as-value] 
-      :if ([:len  ($result->"time")] = 0 ) do={
-        :return "NaN"
-      }
-      :local resultNum [:tonum  ( $result->"time" *1000000)]
-      :return ($resultNum/1000 . "." . $resultNum%1000)
-    }
-
-    # Basic info
-    :local routerName "home-router"
-    :local vps "http://<your vps ip>:9091"
-
-    # Ping your desired host
-    :local ping01 [$pingLatency "8.8.8.8"]
-    :local ping02 [$pingLatency "1.1.1.1"]
-
-    # Ping with domain name (for example google.com)
-    :local ip03 [:resolve "google.com"]
-    :local ping03 [$pingLatency $ip03]
-
-    # Other Mertics
-    :local connCount [/ip firewall connection print count-only]
-
-    # Body builder (Update according to your ping above)
-    :local body ("routeros_ping_latency{target=\"8.8.8.8\"} " . $ping01 . "\n")
-    :set body ($body . "routeros_ping_latency{target=\"1.1.1.1\"} " . $ping02. "\n")
-    :set body ($body . "routeros_ping_latency{target=\"google.com\"} " . $ping03. "\n")
-
-    :set body ($body . "routeros_fw_connections " . $connCount . "\n")
-
-    # Send to VPS
-    /tool fetch url=($vps . "/metrics/job/routeros/instance/" . $routerName) \
-        http-method=post http-data=$body output=none
-    ```
-2. Modify the script to fit your needs. You can add more metrics as you want. Make sure to update vps variable with your VPS IP address or domain name.
+        # For Tag WEB
+        :local pingWEBTargets {"google.com"}
+        :foreach t in=$pingWEBTargets do={
+            :local ip [:resolve $t]
+            :local latency [$pingLatency $ip]
+            :set pingMetrics ($pingMetrics . "routeros_ping_latency{target=\"$t\",tag=\"WEB\"} $latency\n")
+        }
+        ```
 3. Schedule the script to run every 30 seconds.
 
     ```
